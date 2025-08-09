@@ -7,6 +7,8 @@ import ImageKit from "imagekit";
 import {v4 as uuidv4} from "uuid"
 import { NextRequest, NextResponse } from "next/server";
 import { request } from "http";
+import { FileType } from "lucide-react";
+import { fa } from "zod/v4/locales";
 
 
 //imageKit credentials
@@ -54,9 +56,46 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Parent folder not found' }, { status: 401 });
         }
 
+        if(!file.type.startsWith("image/") && file.type !=="application/pdf") {
+            return NextResponse.json({ error: 'Only images and pdf are supported' }, { status: 401 });
+        }
 
+        const buffer = await file.arrayBuffer()
+        const fileBuffer = Buffer.from(buffer)
+
+        const folderPath = parentId ? `/droply/${userId}/folder/${parentId}` : `/droply/${userId}`
+
+        const originalFilename = file.name
+        const fileExtension = originalFilename.split(".").pop() || ""
+        //check for empty extension
+        //validation for not storing exe, php
+        const uniqueFilename = `${uuidv4()}.${fileExtension}`
+
+        const uploadResponse = await imagekit.upload({
+            file: fileBuffer,
+            fileName:uniqueFilename,
+            folder: folderPath,
+            useUniqueFileName: false
+        })
+
+        const fileData = {
+            name: originalFilename,
+            path: uploadResponse.filePath,
+            size: file.size,
+            type: file.type,
+            fileUrl: uploadResponse.url,
+            thumbnailUrl: uploadResponse.thumbnailUrl,
+            userId: userId,
+            parentId: parentId,
+            isFolder: false,
+            isStarred: false,
+            isTrash: false
+        }
+
+        const [newFile] = await db.insert(files).values(fileData).returning();
+        return NextResponse.json(newFile);
 
     } catch (error) {
-        
+        return NextResponse.json({ error: 'Failed to upload file' }, { status: 401 });
     }
 }
