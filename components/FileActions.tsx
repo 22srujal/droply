@@ -2,7 +2,8 @@
 
 import { Star, Trash, X, ArrowUpFromLine, Download } from "lucide-react";
 import { Button } from "@heroui/button";
-import type { File as FileType } from "@/lib/db/schema";
+
+import { FileType } from "imagekit/dist/libs/interfaces";
 
 interface FileActionsProps {
   file: FileType;
