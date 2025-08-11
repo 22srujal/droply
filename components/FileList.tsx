@@ -15,6 +15,7 @@ import { Tooltip } from "@heroui/tooltip";
 import { Card } from "@heroui/card";
 import { addToast } from "@heroui/toast";
 import { formatDistanceToNow, format } from "date-fns";
+import type { File as FileType } from "@/lib/db/schema";
 import axios from "axios";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import FileEmptyState from "@/components/FileEmptyState";
@@ -24,7 +25,6 @@ import FileLoadingState from "@/components/FileLoadingState";
 import FileTabs from "@/components/FileTabs";
 import FolderNavigation from "@/components/FolderNavigation";
 import FileActionButtons from "@/components/FileActionButtons";
-import { FileType } from "imagekit/dist/libs/interfaces";
 
 interface FileListProps {
   userId: string;
@@ -60,7 +60,13 @@ export default function FileList({
       }
 
       const response = await axios.get(url);
-      setFiles(response.data);
+      setFiles(
+        response.data.map((file: any) => ({
+          ...file,
+          createdAt: new Date(file.createdAt),
+          updatedAt: new Date(file.updatedAt),
+        }))
+      );
     } catch (error) {
       console.error("Error fetching files:", error);
       addToast({
