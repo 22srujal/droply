@@ -1,96 +1,54 @@
 "use client";
 
-import { Star, Trash, X, ArrowUpFromLine, Download } from "lucide-react";
+import { RefreshCw, Trash } from "lucide-react";
 import { Button } from "@heroui/button";
 
-import { FileType } from "imagekit/dist/libs/interfaces";
-
-interface FileActionsProps {
-  file: FileType;
-  onStar: (id: string) => void;
-  onTrash: (id: string) => void;
-  onDelete: (file: FileType) => void;
-  onDownload: (file: FileType) => void;
+interface FileActionButtonsProps {
+  activeTab: string;
+  trashCount: number;
+  folderPath: Array<{ id: string; name: string }>;
+  onRefresh: () => void;
+  onEmptyTrash: () => void;
 }
 
-export default function FileActions({
-  file,
-  onStar,
-  onTrash,
-  onDelete,
-  onDownload,
-}: FileActionsProps) {
+export default function FileActionButtons({
+  activeTab,
+  trashCount,
+  folderPath,
+  onRefresh,
+  onEmptyTrash,
+}: FileActionButtonsProps) {
   return (
-    <div className="flex flex-wrap gap-2 justify-end">
-      {/* Download button */}
-      {!file.isTrash && !file.isFolder && (
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
+      <h2 className="text-xl sm:text-2xl font-semibold truncate max-w-full">
+        {activeTab === "all" &&
+          (folderPath.length > 0
+            ? folderPath[folderPath.length - 1].name
+            : "All Files")}
+        {activeTab === "starred" && "Starred Files"}
+        {activeTab === "trash" && "Trash"}
+      </h2>
+      <div className="flex gap-2 sm:gap-3 self-end sm:self-auto">
         <Button
           variant="flat"
           size="sm"
-          onClick={() => onDownload(file)}
-          className="min-w-0 px-2"
-          startContent={<Download className="h-4 w-4" />}
+          onClick={onRefresh}
+          startContent={<RefreshCw className="h-4 w-4" />}
         >
-          <span className="hidden sm:inline">Download</span>
+          Refresh
         </Button>
-      )}
-
-      {/* Star button */}
-      {!file.isTrash && (
-        <Button
-          variant="flat"
-          size="sm"
-          onClick={() => onStar(file.id)}
-          className="min-w-0 px-2"
-          startContent={
-            <Star
-              className={`h-4 w-4 ${
-                file.isStarred
-                  ? "text-yellow-400 fill-current"
-                  : "text-gray-400"
-              }`}
-            />
-          }
-        >
-          <span className="hidden sm:inline">
-            {file.isStarred ? "Unstar" : "Star"}
-          </span>
-        </Button>
-      )}
-
-      {/* Trash/Restore button */}
-      <Button
-        variant="flat"
-        size="sm"
-        onClick={() => onTrash(file.id)}
-        className="min-w-0 px-2"
-        color={file.isTrash ? "success" : "default"}
-        startContent={
-          file.isTrash ? (
-            <ArrowUpFromLine className="h-4 w-4" />
-          ) : (
-            <Trash className="h-4 w-4" />
-          )
-        }
-      >
-        <span className="hidden sm:inline">
-          {file.isTrash ? "Restore" : "Delete"}
-        </span>
-      </Button>
-
-      {/* Delete permanently button */}
-      {file.isTrash && (
-        <Button
-          variant="flat"
-          size="sm"
-          color="danger"
-          onClick={() => onDelete(file)}
-          className="min-w-0 px-2"
-          startContent={<X className="h-4 w-4" />}
-        >
-          <span className="hidden sm:inline">Remove</span>
-        </Button>
-      )}
+        {activeTab === "trash" && trashCount > 0 && (
+          <Button
+            color="danger"
+            variant="flat"
+            size="sm"
+            onClick={onEmptyTrash}
+            startContent={<Trash className="h-4 w-4" />}
+          >
+            Empty Trash
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
