@@ -3,7 +3,11 @@
 import { File, Star, Trash } from "lucide-react";
 import { Tabs, Tab } from "@heroui/tabs";
 import Badge from "@/components/ui/Badge";
-import { FileType } from "imagekit/dist/libs/interfaces";
+import { FileType as IKFileType } from "imagekit/dist/libs/interfaces";
+
+type FileType = IKFileType & {
+  isTrash?: boolean;
+};
 
 interface FileTabsProps {
   activeTab: string;
