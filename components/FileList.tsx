@@ -15,7 +15,23 @@ import { Tooltip } from "@heroui/tooltip";
 import { Card } from "@heroui/card";
 import { addToast } from "@heroui/toast";
 import { formatDistanceToNow, format } from "date-fns";
-import type { FileType } from "@/lib/db/schema";
+// If FileType is not exported, define it locally here:
+export interface FileType {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  isStarred: boolean;
+  isTrash: boolean;
+  isFolder: boolean;
+  path?: string;
+  fileUrl?: string;
+}
+
+// Remove the broken import
+// import type { FileType } from "@/lib/db/schema";
 import axios from "axios";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import FileEmptyState from "@/components/FileEmptyState";
